@@ -42,7 +42,7 @@ A package containing usage examples of the rosbag2 api, for reading, writing, an
 
 *Dependencies*
 ROS2 Foxy
-rosbag2
+rosbag2_cpp
 std_msgs
 sensor_msgs
 
