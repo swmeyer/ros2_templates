@@ -1,0 +1,22 @@
+/templates:
+  example_node_name:
+    ros__parameters:
+      #example parameters:
+      string_param: "text"
+      double_param: 0.0
+      bool_param: False
+      target_frame: "rear_axis_middle"
+      
+      #these are namespaced/categorized parameters:
+      category:
+        sub_param: True
+
+      #Parameters expected by the template node:
+      input_topic: "/input_topic"
+      output_topic1: "/output_topic1"
+      output_topic2: "/output_topic2"
+      publish: True
+      x_max: 100
+      timer_ms: 100
+      
+      #this is a comment

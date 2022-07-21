@@ -1,0 +1,5 @@
+/rosbag2_api:
+  bagread_node:
+    ros__parameters:
+      bagfile: "/home/stephanie/Downloads/vegas_snipit_3"
+      topics_to_record: "/joystick/brake_cmd_override /joystick/accelerator_cmd_max /luminar_left_points"
