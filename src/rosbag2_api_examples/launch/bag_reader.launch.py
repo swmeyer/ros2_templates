@@ -12,13 +12,22 @@ def generate_launch_description():
 		'config'
 		)
 
+	print(get_package_share_directory('rosbag2_api_examples'))
+
+	bagfile_path = os.path.join(
+		get_package_share_directory('rosbag2_api_examples'),
+		'../../../../bags'
+		)
+
+	print(bagfile_path)
+
 	template_node_description = Node(
 			package='rosbag2_api_examples',
 			namespace='rosbag2_api',
 			executable='bagread_node',
 			name='bagread_node',
 			# output='screen', #Uncomment to allow print statements to print to terminal
-			parameters=[os.path.join(config_path, 'bag_params.yaml')]
+			parameters=[os.path.join(config_path, 'bag_params.yaml'), {'bagfile_path': bagfile_path}]
 		)
 
 	return LaunchDescription([

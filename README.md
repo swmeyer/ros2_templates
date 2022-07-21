@@ -46,10 +46,17 @@ rosbag2
 std_msgs
 sensor_msgs
 
+*Usage*
+Update the bag_params.yaml file to reflect the bagfile and topic names that you'd like to use
+
+In this slim example, only std_msgs::msg::Float32 and sensor_msgs::msg::PointCloud2 types are supported
+
+This repository is set up to include a bags folder within it. This is not recommended for normal practice! Large bag files should not be pushed to git, as they tend to slow down pulls and pushes to the remote. To reference bag files in a different location, either add a relative path to the beginning of the bagfile parameter, or edit the launch file to use a different bag path with respect to the package share location (ros2_templates/install/rosbag2_api_examples/share/rosbag2_api_examples) 
+
 *Build*
 
 ```
-colcon build --packages-select rosbag2_api_examples
+colcon build --symlink-install --packages-select rosbag2_api_examples
 ```
 
 *Run*

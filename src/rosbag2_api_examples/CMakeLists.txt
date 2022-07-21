@@ -26,9 +26,11 @@ find_package(rosbag2_cpp REQUIRED)
 
 # find_package(OpenCV REQUIRED)
 # find_package(Eigen3 REQUIRED)
+find_package (Boost COMPONENTS filesystem)
 
 include_directories(
   include
+   ${Boost_INCLUDE_DIRS}
   # ${OpenCV_INCLUDE_DIRS}
 )
 
@@ -36,7 +38,7 @@ include_directories(
 # In-node bag reading:
 add_executable(bagread_node src/bag_read_node.cpp)
 ament_target_dependencies(bagread_node rclcpp std_msgs sensor_msgs rosbag2_cpp)
-
+target_link_libraries(bagread_node ${Boost_FILESYSTEM_LIBRARY})
 
 install(
   TARGETS 

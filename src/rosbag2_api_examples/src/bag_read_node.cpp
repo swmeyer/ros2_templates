@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <boost/filesystem.hpp>
 
 
 //Messages
@@ -31,17 +32,24 @@ class TemplateNode : public rclcpp::Node
             //main content
 
             //Declare Parameters
+            this->declare_parameter<std::string>("bagfile_path", "test_bag");
             this->declare_parameter<std::string>("bagfile", "../rosbag2_test_data");
             this->declare_parameter<std::string>("topics_to_record", "");
 
             //Get Parameters
-            std::string bagfile;
+            std::string bagfile_path, bagfile;
+            this->get_parameter<std::string>("bagfile_path", bagfile_path);
             this->get_parameter<std::string>("bagfile", bagfile);
             this->get_parameter<std::string>("topics_to_record", this->topics_to_record);
 
             this->reader = new rosbag2_cpp::readers::SequentialReader();
 
-            this->storage_options.uri = bagfile;
+            boost::filesystem::path bagfile_path_, bagfile_, full_bagpath;
+            bagfile_path_ = bagfile_path;
+            bagfile_ = bagfile;
+            full_bagpath = bagfile_path_/bagfile_;
+
+            this->storage_options.uri = full_bagpath.string();
             this->storage_options.storage_id = "sqlite3";
 
             this->converter_options.input_serialization_format = "cdr";
