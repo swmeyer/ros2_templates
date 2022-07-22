@@ -18,9 +18,11 @@ This package contains standard templates for code components such as launch file
 
 ### How to build and run the examples
 **Package: template_package**
+
 A package to show basic node contruction and provide templates for associated files and scripts
 
 *Dependencies*
+
 ROS2 Foxy
 std_msgs
 
@@ -41,12 +43,14 @@ ros2 launch template_package template.launch.py
 A package containing usage examples of the rosbag2 api, for reading, writing, and manipulating ros2 bags from within ros2 nodes
 
 *Dependencies*
+
 ROS2 Foxy
 rosbag2_cpp
 std_msgs
 sensor_msgs
 
 *Usage*
+
 Update the bag_params.yaml file to reflect the bagfile and topic names that you'd like to use
 
 In this slim example, only std_msgs::msg::Float32 and sensor_msgs::msg::PointCloud2 types are supported
