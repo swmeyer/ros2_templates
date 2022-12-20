@@ -1,6 +1,7 @@
-log
 build
+log
 install
 bags
+src/dependencies
 output.txt
 output2.txt

@@ -15,6 +15,7 @@ This package contains standard templates for code components such as launch file
  - [x] README.md template
  - [x] parameter type protection/ dynamic parameter usage examples
  - [x] ros2 bag api example for bag reading
+ - [x] multithreaded executor example (for multithreaded ROS subscription callbacks)
 
 ### How to build and run the examples
 **Package: template_package**
@@ -23,8 +24,10 @@ A package to show basic node contruction and provide templates for associated fi
 
 *Dependencies*
 
-ROS2 Foxy
+ROS2 Galactic
+rosbag2_cpp
 std_msgs
+sensor_msgs
 
 *Build*
 
@@ -39,15 +42,11 @@ source install/setup.bash
 ros2 launch template_package template.launch.py
 ```
 
-**Package: ros2_api_examples**
-A package containing usage examples of the rosbag2 api, for reading, writing, and manipulating ros2 bags from within ros2 nodes
+**Other Examples**
 
-*Dependencies*
+**ROS2 Bag API Example**
+The package contains usage examples of the rosbag2 api, for reading, writing, and manipulating ros2 bags from within ros2 nodes
 
-ROS2 Foxy
-rosbag2_cpp
-std_msgs
-sensor_msgs
 
 *Usage*
 
@@ -57,17 +56,21 @@ In this slim example, only std_msgs::msg::Float32 and sensor_msgs::msg::PointClo
 
 This repository is set up to include a bags folder within it. This is not recommended for normal practice! Large bag files should not be pushed to git, as they tend to slow down pulls and pushes to the remote. To reference bag files in a different location, either add a relative path to the beginning of the bagfile parameter, or edit the launch file to use a different bag path with respect to the package share location (ros2_templates/install/rosbag2_api_examples/share/rosbag2_api_examples) 
 
-*Build*
+*Run*
 
 ```
-colcon build --symlink-install --packages-select rosbag2_api_examples
+source install/setup.bash
+ros2 launch teamplate_package bag_reader.launch.py
 ```
+
+**Multithreaded ROS Node Example**
+The package contains a templated node that uses a multithreaded executor and callback groups, in order to achieve multithreaded callback execution. 
 
 *Run*
 
 ```
 source install/setup.bash
-ros2 launch rosbag2_api_examples bag_reader.launch.py
+ros2 launch template_package multithread.launch.py
 ```
 
  ### How to Use the Template Node to Make Your Own Package

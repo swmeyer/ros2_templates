@@ -8,26 +8,17 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
 
 	config_path = os.path.join(
-		get_package_share_directory('rosbag2_api_examples'),
+		get_package_share_directory('template_package'),
 		'config'
 		)
 
-	print(get_package_share_directory('rosbag2_api_examples'))
-
-	bagfile_path = os.path.join(
-		get_package_share_directory('rosbag2_api_examples'),
-		'../../../../bags'
-		)
-
-	print(bagfile_path)
-
 	template_node_description = Node(
-			package='rosbag2_api_examples',
-			namespace='rosbag2_api',
+			package='template_package',
+			namespace='templates',
 			executable='bagread_node',
 			name='bagread_node',
 			# output='screen', #Uncomment to allow print statements to print to terminal
-			parameters=[os.path.join(config_path, 'bag_params.yaml'), {'bagfile_path': bagfile_path}]
+			parameters=[os.path.join(config_path, 'other_examples/bag_params.yaml')]
 		)
 
 	return LaunchDescription([

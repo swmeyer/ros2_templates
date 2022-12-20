@@ -4,8 +4,7 @@
 A package to show basic node contruction and provide templates for associated files and scripts
 
 ## Dependencies
-ROS2 Foxy, Galactic, or Humble
-...
+ROS2 Foxy or Galactic
 
 ## Build
 

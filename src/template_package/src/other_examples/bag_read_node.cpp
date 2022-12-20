@@ -7,13 +7,15 @@
 // --------------------------
 #include "rclcpp/rclcpp.hpp"
 
+#include "rclcpp/serialization.hpp"
+#include "rclcpp/serialized_message.hpp"
+
 #include <rosbag2_cpp/readers/sequential_reader.hpp>
-// #include <rosbag2_cpp/typesupport_helpers.hpp>
+#include <rosbag2_cpp/typesupport_helpers.hpp>
 // #include "rosidl_runtime_cpp/message_type_support_decl.hpp"
 
 #include <iostream>
 #include <fstream>
-#include <boost/filesystem.hpp>
 
 
 //Messages
@@ -32,24 +34,18 @@ class TemplateNode : public rclcpp::Node
             //main content
 
             //Declare Parameters
-            this->declare_parameter<std::string>("bagfile_path", "test_bag");
             this->declare_parameter<std::string>("bagfile", "../rosbag2_test_data");
             this->declare_parameter<std::string>("topics_to_record", "");
 
             //Get Parameters
-            std::string bagfile_path, bagfile;
-            this->get_parameter<std::string>("bagfile_path", bagfile_path);
+            std::string bagfile;
             this->get_parameter<std::string>("bagfile", bagfile);
             this->get_parameter<std::string>("topics_to_record", this->topics_to_record);
 
             this->reader = new rosbag2_cpp::readers::SequentialReader();
 
-            boost::filesystem::path bagfile_path_, bagfile_, full_bagpath;
-            bagfile_path_ = bagfile_path;
-            bagfile_ = bagfile;
-            full_bagpath = bagfile_path_/bagfile_;
-
-            this->storage_options.uri = full_bagpath.string();
+            RCLCPP_INFO(this->get_logger(), "Reading from bag: %s", bagfile.c_str());
+            this->storage_options.uri = bagfile;
             this->storage_options.storage_id = "sqlite3";
 
             this->converter_options.input_serialization_format = "cdr";
@@ -76,7 +72,8 @@ class TemplateNode : public rclcpp::Node
         
         //Objects
         rosbag2_cpp::readers::SequentialReader* reader;
-        rosbag2_cpp::StorageOptions storage_options{};
+        // rosbag2_cpp::StorageOptions storage_options{};
+        rosbag2_storage::StorageOptions storage_options{};
         rosbag2_cpp::ConverterOptions converter_options{};
 
 
@@ -103,35 +100,50 @@ class TemplateNode : public rclcpp::Node
 
             // deserialization and conversion to ros message
 
-            auto ros_message = std::make_shared<rosbag2_cpp::rosbag2_introspection_message_t>();
-            ros_message->time_stamp = 0;
-            ros_message->message = nullptr;
-            ros_message->allocator = rcutils_get_default_allocator();
+            // auto ros_message = std::make_shared<rosbag2_cpp::rosbag2_introspection_message_t>();
+            // ros_message->time_stamp = 0;
+            // ros_message->message = nullptr;
+            // ros_message->allocator = rcutils_get_default_allocator();
 
-            rosbag2_cpp::SerializationFormatConverterFactory factory;
-            std::unique_ptr<rosbag2_cpp::converter_interfaces::SerializationFormatDeserializer> cdr_deserializer;
-            cdr_deserializer = factory.load_deserializer("cdr");
+            //bag help came from here: https://github.com/ros2/rosbag2/blob/master/rosbag2_tests/test/rosbag2_tests/test_rosbag2_cpp_api.cpp
+            //Our previous way of doing this doesn't seem to work for custom messages outside of ros2 foxy
 
+            // rosbag2_cpp::SerializationFormatConverterFactory factory;
+            // std::unique_ptr<rosbag2_cpp::converter_interfaces::SerializationFormatDeserializer> cdr_deserializer;
+            // cdr_deserializer = factory.load_deserializer("cdr");
+
+            // auto type_library = rosbag2_cpp::get_typesupport_library(topic_type, "rosidl_typesupport_cpp");
+            // const rosidl_message_type_support_t * type_support = rosbag2_cpp::get_typesupport_handle(topic_type, "rosidl_typesupport_cpp", type_library);
+                
             // ros message data
             if (serialized_msg->topic_name == "/joystick/brake_cmd_override")
             {
-                const rosidl_message_type_support_t * type_support = rosidl_typesupport_cpp::get_message_type_support_handle<std_msgs::msg::Float32>();
+                // // const rosidl_message_type_support_t * type_support = rosidl_typesupport_cpp::get_message_type_support_handle<std_msgs::msg::Float32>();
+                // auto type_library = rosbag2_cpp::get_typesupport_library(topic_type, "rosidl_typesupport_cpp");
+                // const rosidl_message_type_support_t * type_support = rosbag2_cpp::get_typesupport_handle(topic_type, "rosidl_typesupport_cpp", type_library);
                 std_msgs::msg::Float32 msg;
-                ros_message->message = &msg;
-                cdr_deserializer->deserialize(serialized_msg, type_support, ros_message);
+                // ros_message->message = &msg;
+                // cdr_deserializer->deserialize(serialized_msg, type_support, ros_message);
+
+
+                rclcpp::Serialization<std_msgs::msg::Float32> serialization;
+                rclcpp::SerializedMessage extracted_serialized_msg(*serialized_msg->serialized_data);
+                serialization.deserialize_message(&extracted_serialized_msg, &msg);
 
                 file2.open("output2.txt", std::ios_base::app);
                 file2 << "   " << msg.data << "\n";
                 file2.close();
 
-                //NOTE! We can also publish msg out on a topic, or process it directly in an algorithm node
-
             } else if (serialized_msg->topic_name == "/joystick/accelerator_cmd_max")
             {
-                const rosidl_message_type_support_t * type_support = rosidl_typesupport_cpp::get_message_type_support_handle<std_msgs::msg::Float32>();
+                // const rosidl_message_type_support_t * type_support = rosidl_typesupport_cpp::get_message_type_support_handle<std_msgs::msg::Float32>();
                 std_msgs::msg::Float32 msg;
-                ros_message->message = &msg;
-                cdr_deserializer->deserialize(serialized_msg, type_support, ros_message);
+                // ros_message->message = &msg;
+                // cdr_deserializer->deserialize(serialized_msg, type_support, ros_message);
+
+                rclcpp::Serialization<std_msgs::msg::Float32> serialization;
+                rclcpp::SerializedMessage extracted_serialized_msg(*serialized_msg->serialized_data);
+                serialization.deserialize_message(&extracted_serialized_msg, &msg);
 
                 file2.open("output2.txt", std::ios_base::app);
                 file2 << "   " << msg.data << "\n";
@@ -139,17 +151,20 @@ class TemplateNode : public rclcpp::Node
 
             } else if (serialized_msg->topic_name == "/luminar_left_points")
             {
-                const rosidl_message_type_support_t * type_support = rosidl_typesupport_cpp::get_message_type_support_handle<sensor_msgs::msg::PointCloud2>();
+                // const rosidl_message_type_support_t * type_support = rosidl_typesupport_cpp::get_message_type_support_handle<sensor_msgs::msg::PointCloud2>();
                 sensor_msgs::msg::PointCloud2 msg;
-                ros_message->message = &msg;
-                cdr_deserializer->deserialize(serialized_msg, type_support, ros_message);
+                // ros_message->message = &msg;
+                // cdr_deserializer->deserialize(serialized_msg, type_support, ros_message);
+
+                rclcpp::Serialization<sensor_msgs::msg::PointCloud2> serialization;
+                rclcpp::SerializedMessage extracted_serialized_msg(*serialized_msg->serialized_data);
+                serialization.deserialize_message(&extracted_serialized_msg, &msg);
 
                 file2.open("output2.txt", std::ios_base::app);
                 file2 << "   " << msg.height << "\n";
                 file2 << "   " << msg.width << "\n";
-                // There's more pointcloud2 members... print them out at will, or work with the pointclouds directly in code!
                 file2.close();
-            }
+            } 
 
             return true;
         }
