@@ -101,7 +101,7 @@ class BagWriteNode : public rclcpp::Node
 
         // Methods
 
-        bool processMessage(const std::shared_ptr<rosbag2_storage::SerializedBagMessage> serialized_msg, const std::string& topic_type)
+        bool processMessage(std::shared_ptr<rosbag2_storage::SerializedBagMessage> serialized_msg, rosbag2_storage::TopicMetadata& topic_metadata)
         {
             std::ofstream file2("output2.txt", std::ios_base::app);
             file2.close();
@@ -126,23 +126,32 @@ class BagWriteNode : public rclcpp::Node
             // &serialized_msg.get_rcl_serialized_message(), [](rcutils_uint8_array_t * /* data */) {});
 
 
-            if (this->topics_to_write.find(serialized_msg->topic_name) != std::string::npos)
-            {
+            // if (this->topics_to_write.find(serialized_msg->topic_name) != std::string::npos)
+            // {
 
+            //     file2.open("output2.txt", std::ios_base::app);
+            //     file2 << "Recording topic " << serialized_msg->topic_name << "\n";
+            //     file2.close();
+
+            // } else
+            // {
+            //     file2.open("output2.txt", std::ios_base::app);
+            //     file2 << "Skipping topic " <<serialized_msg->topic_name << "\n";
+            //     file2.close();
+            //     return false;
+            // }
+
+            // file2.open("output2.txt", std::ios_base::app);
+            // file2 << "Found topic: " << serialized_msg->topic_name << ". ";
+            bool topic_found = serialized_msg->topic_name == "/joystick/brake_cmd_override";
+            // file2 << "This is the same as /joystick/brake_cmd_override? " <<  topic_found << "\n";
+            // file2.close();
+
+            if (topic_found)
+            {
                 file2.open("output2.txt", std::ios_base::app);
-                file2 << "Recording topic " << serialized_msg->topic_name << "\n";
-                file2.close();
-
-            } else
-            {
-                file2.open("output2.txt", std::ios_base::app);
-                file2 << "Skipping topic " <<serialized_msg->topic_name << "\n";
-                file2.close();
-                return false;
-            }
-
-            if (serialized_msg->topic_name == "/joystick/brake_cmd_override")
-            {
+                file2 << "Found topic: " << serialized_msg->topic_name << ". \n";
+                file2.close();  
 
                 //Write to csv file:
                 std_msgs::msg::Float32 msg;
@@ -150,14 +159,17 @@ class BagWriteNode : public rclcpp::Node
                 rclcpp::SerializedMessage extracted_serialized_msg(*serialized_msg->serialized_data);
                 serialization.deserialize_message(&extracted_serialized_msg, &msg);
 
-                file2.open("output2.txt", std::ios_base::app);
-                file2 << "   " << msg.data << "\n";
-                file2.close();
-
-
                 //write to bag:
-                // serialized_msg->topic_name  = "/joystick/brake_cmd"; //optionally rename the topic!
-                // this->writer->write(serialized_msg);
+                serialized_msg->topic_name  = "/joystick/brake_cmd"; //optionally rename the topic!
+                topic_metadata.name = "/joystick/brake_cmd";
+                writer->create_topic(topic_metadata);
+
+                this->writer->write(serialized_msg);
+
+                
+                file2.open("output2.txt", std::ios_base::app);
+                file2 << "   Writing data to file:  " << msg.data << "\n";
+                file2.close();
 
             }
 
@@ -176,7 +188,7 @@ class BagWriteNode : public rclcpp::Node
             file.open("output.txt", std::ios_base::app);
             file << "Found " << topics.size() << " topics\n";
             file.close();
-            std::map<std::string, std::string> topics_map;
+            std::map<std::string, rosbag2_storage::TopicMetadata> topics_meta_map;
 
             // about metadata
             for (rosbag2_storage::TopicMetadata topic:topics)
@@ -186,7 +198,7 @@ class BagWriteNode : public rclcpp::Node
                 file << "meta type: " << topic.type << std::endl;
                 file.close();
  
-                topics_map.insert(std::pair<std::string, std::string>(topic.name, topic.type));
+                topics_meta_map.insert(std::pair<std::string, rosbag2_storage::TopicMetadata>(topic.name, topic));
             }
             
             // read and deserialize "serialized data"
@@ -197,15 +209,15 @@ class BagWriteNode : public rclcpp::Node
 
                 // serialized data
                 std::shared_ptr<rosbag2_storage::SerializedBagMessage> serialized_message = reader->read_next();
-                std::string topic_type = topics_map[serialized_message->topic_name];
+                rosbag2_storage::TopicMetadata topic_meta = topics_meta_map[serialized_message->topic_name];
 
                 file.open("output.txt", std::ios_base::app);
                 file << "     Topic: " << serialized_message->topic_name << "\n";
                 file << "     Stamp: " << serialized_message->time_stamp << "\n";
-                file << "     Type:  " << topic_type << "\n"; 
+                file << "     Type:  " << topic_meta.type << "\n"; 
                 file.close();
 
-                if (this->processMessage(serialized_message, topic_type))
+                if (this->processMessage(serialized_message, topic_meta))
                 {
                     file.open("output.txt", std::ios_base::app);
                     file << "    successs\n";
