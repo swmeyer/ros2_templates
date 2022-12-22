@@ -15,10 +15,10 @@ def generate_launch_description():
 	template_node_description = Node(
 			package='template_package',
 			namespace='templates',
-			executable='bagread_node',
-			name='bagread_node',
+			executable='bagwrite_node',
+			name='bagwrite_node',
 			# output='screen', #Uncomment to allow print statements to print to terminal
-			parameters=[os.path.join(config_path, 'other_examples/bag_params.yaml')]
+			parameters=[os.path.join(config_path, 'other_examples/bagwrite_params.yaml')]
 		)
 
 	return LaunchDescription([

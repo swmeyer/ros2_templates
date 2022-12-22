@@ -44,6 +44,9 @@ ament_target_dependencies(template_node rclcpp std_msgs)
 add_executable(bagread_node src/other_examples/bag_read_node.cpp)
 ament_target_dependencies(bagread_node rclcpp std_msgs sensor_msgs rosbag2_cpp)
 
+add_executable(bagwrite_node src/other_examples/bag_write_node.cpp)
+ament_target_dependencies(bagwrite_node rclcpp std_msgs sensor_msgs rosbag2_cpp)
+
 # # Multithreaded Callbacks/Node Execution:
 add_executable(multithreaded_node src/other_examples/multithreaded_node.cpp src/agnostic_logic_class.cpp)
 ament_target_dependencies(multithreaded_node rclcpp std_msgs)
@@ -53,6 +56,7 @@ install(
   TARGETS 
     template_node
     bagread_node
+    bagwrite_node
     multithreaded_node
   DESTINATION lib/${PROJECT_NAME}/
 )

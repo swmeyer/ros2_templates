@@ -1,0 +1,9 @@
+/templates:
+  bagwrite_node:
+    ros__parameters:
+      bagfile_in: "/home/atr/car_bags/data_for_testing/2022-09-28_TEXAS_full_run1" #"/home/stephanie/Downloads/vegas_snipit_3"
+      bagfile_out: "write_test"
+      topics_to_record: "/raptor_dbw_interface/wheel_speed_report /joystick/brake_cmd_override /joystick/accelerator_cmd_max /luminar_left_points"
+      # topics_to_record: "/joystick/accelerator_cmd_max"
+      # topics_to_record: "/luminar_left_points"
+      timer_ms: 100

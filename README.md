@@ -60,7 +60,7 @@ This repository is set up to include a bags folder within it. This is not recomm
 
 ```
 source install/setup.bash
-ros2 launch teamplate_package bag_reader.launch.py
+ros2 launch teamplate_package bagread.launch.py
 ```
 
 **Multithreaded ROS Node Example**
