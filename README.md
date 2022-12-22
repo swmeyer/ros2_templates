@@ -153,9 +153,3 @@ ros2 launch template_package multithread.launch.py
 - Variables will have a brief description where declared, including uints in [] if applicable (ie [m/s])
 
 - Config/yaml files will have a brief description, including units in [] if applicable, of each parameter
-
-## Gitlab Standards
-- **run/** branches are ready to execute on the car, full-stack functional. A new /run branch should only be created when a new version of the software stack with significantly altered functionality or intentions is developed
-- **dev-** branches are primary development branches for different sections of code (ie dev-perception, dev-control, and so on)
-- **feature/** branches are created off of the dev- branches to develop specific functionalities
-- Merge strategy: develop in feature/ branches, then merge **feature/ -> dev-**, then **dev- -> run/**
